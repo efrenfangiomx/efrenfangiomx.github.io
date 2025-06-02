@@ -1,0 +1,1401 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fangio Telecom - Gestor de Enlaces PtP con Análisis de Factibilidad</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0c29 0%, #24243e 35%, #313264 100%);
+      min-height: 100vh;
+      color: #333;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background particles */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.1), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.1), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.1), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.1), transparent);
+      background-repeat: repeat;
+      background-size: 150px 150px;
+      animation: drift 20s infinite linear;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0); }
+      to { transform: translate(-150px, -150px); }
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Header mejorado con logo impresionante */
+    .header {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 40px;
+      margin-bottom: 30px;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    /* Contenedor del logo con efectos espectaculares */
+    .logo-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      perspective: 1000px;
+    }
+
+    .logo {
+      width: 100%;
+      height: 100%;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    /* Múltiples capas de efectos visuales */
+    .logo::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #667eea);
+      background-size: 300% 300%;
+      border-radius: 27px;
+      animation: gradientShift 3s ease infinite;
+      z-index: -2;
+    }
+
+    .logo::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      background: linear-gradient(135deg, rgba(15, 12, 41, 0.9), rgba(36, 36, 62, 0.9));
+      border-radius: 22px;
+      z-index: -1;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* Imagen del logo mejorada */
+    .logo img {
+      width: 85%;
+      height: 85%;
+      object-fit: contain;
+      border-radius: 16px;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3))
+              brightness(1.1)
+              contrast(1.1)
+              saturate(1.2);
+      transition: all 0.4s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Efectos de hover espectaculares */
+    .logo:hover {
+      transform: translateY(-8px) rotateX(10deg) rotateY(5deg) scale(1.05);
+      box-shadow: 
+        0 30px 60px rgba(102, 126, 234, 0.4),
+        0 15px 35px rgba(0, 0, 0, 0.3),
+        inset 0 2px 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .logo:hover img {
+      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.4))
+              brightness(1.2)
+              contrast(1.2)
+              saturate(1.3);
+      transform: scale(1.02);
+    }
+
+    /* Anillo orbital alrededor del logo */
+    .logo-orbit {
+      position: absolute;
+      inset: -15px;
+      border: 2px solid transparent;
+      border-radius: 50%;
+      background: linear-gradient(45deg, rgba(102, 126, 234, 0.6), rgba(118, 75, 162, 0.6), transparent, transparent);
+      animation: orbit 4s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes orbit {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Partículas flotantes alrededor del logo */
+    .logo-particles {
+      position: absolute;
+      inset: -30px;
+      pointer-events: none;
+    }
+
+    .logo-particles::before,
+    .logo-particles::after {
+      content: '';
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: radial-gradient(circle, rgba(102, 126, 234, 0.8), transparent);
+      border-radius: 50%;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .logo-particles::before {
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .logo-particles::after {
+      bottom: 20%;
+      right: 10%;
+      animation-delay: 3s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) scale(1); opacity: 0.7; }
+      50% { transform: translateY(-20px) scale(1.2); opacity: 1; }
+    }
+
+    /* Información de la empresa mejorada */
+    .company-info {
+      flex: 1;
+      position: relative;
+    }
+
+    .company-info h1 {
+      font-size: 3.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff, #e0e7ff, #c7d2fe, #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+      position: relative;
+    }
+
+    .company-info h1::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      border-radius: 2px;
+      box-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
+    }
+
+    .company-info .subtitle {
+      font-size: 1.4rem;
+      color: rgba(255, 255, 255, 0.85);
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      margin-top: 10px;
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .company-info .subtitle::before {
+      content: '●';
+      position: absolute;
+      left: 0;
+      color: #667eea;
+      font-size: 1.2rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    /* Badge de estado premium */
+    .premium-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      animation: badgePulse 3s ease-in-out infinite;
+    }
+
+    @keyframes badgePulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Contenido principal con glassmorphism avanzado */
+    .main-content {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    /* Pestañas modernas */
+    .tabs-container {
+      margin-bottom: 40px;
+    }
+    
+    .tabs {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 8px;
+      gap: 8px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      flex-wrap: wrap;
+    }
+    
+    .tab-button {
+      background: transparent;
+      border: none;
+      border-radius: 12px;
+      padding: 18px 24px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: rgba(255, 255, 255, 0.7);
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+      justify-content: center;
+      min-width: 180px;
+    }
+    
+    .tab-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+      transform: translateY(-2px);
+    }
+    
+    .tab-button.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      box-shadow: 
+        0 8px 25px rgba(102, 126, 234, 0.4),
+        0 3px 10px rgba(0, 0, 0, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeInUp {
+      from { 
+        opacity: 0; 
+        transform: translateY(20px); 
+      }
+      to { 
+        opacity: 1; 
+        transform: translateY(0); 
+      }
+    }
+
+    /* Análisis de Factibilidad */
+    .feasibility-panel {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      border: 1px solid rgba(102, 126, 234, 0.3);
+      border-radius: 16px;
+      padding: 25px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    .feasibility-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      color: #667eea;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .feasibility-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .study-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .study-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .study-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .study-result {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-excellent {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+
+    .status-good {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+    }
+
+    .status-warning {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+
+    .status-critical {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+    }
+
+    .study-details {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.4;
+    }
+
+    .overall-feasibility {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+      border: 2px solid rgba(16, 185, 129, 0.3);
+      border-radius: 16px;
+      padding: 25px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .feasibility-score {
+      font-size: 3rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+
+    .feasibility-text {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    /* Reglas de frecuencia mejoradas */
+    .frecuencia-info { 
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.1), rgba(16, 185, 129, 0.1));
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      backdrop-filter: blur(10px);
+      padding: 25px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      font-weight: 600;
+      box-shadow: 0 8px 25px rgba(52, 211, 153, 0.1);
+      color: #10b981;
+    }
+
+    .frecuencia-info strong {
+      color: #059669;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    /* Área de carga de archivos */
+    .file-upload {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .file-upload::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .file-upload:hover {
+      border-color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      transform: translateY(-2px);
+    }
+
+    .file-upload:hover::before {
+      left: 100%;
+    }
+
+    .file-upload input[type="file"] {
+      display: none;
+    }
+
+    .file-upload label {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .file-upload label:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Grid de formulario mejorado */
+    .form-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+      gap: 25px; 
+      margin-top: 30px; 
+    }
+
+    .form-grid div { 
+      display: flex; 
+      flex-direction: column;
+      position: relative;
+    }
+
+    .form-grid label {
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 8px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid input, .form-grid select {
+      padding: 16px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      color: white;
+    }
+
+    .form-grid input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-grid input:focus, .form-grid select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.2),
+        0 8px 25px rgba(102, 126, 234, 0.1);
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .form-grid input[readonly] {
+      background: rgba(255, 255, 255, 0.02);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: not-allowed;
+    }
+
+    .form-grid input[style*="background-color: #ffffcc"] {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2)) !important;
+      border-color: rgba(251, 191, 36, 0.5) !important;
+      color: #fbbf24 !important;
+      font-weight: 700;
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+    }
+
+    /* Contadores modernos */
+    .enlaces-counter {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(37, 99, 235, 0.1));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      backdrop-filter: blur(15px);
+      color: #60a5fa;
+      padding: 25px;
+      border-radius: 16px;
+      margin-bottom: 30px;
+      font-weight: 700;
+      text-align: center;
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.1);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    /* Botones espectaculares */
+    .action-buttons {
+      margin: 30px 0;
+      text-align: center;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      padding: 16px 32px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn:hover {
+      transform: translateY(-3px);
+    }
+
+    .btn:active {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      color: white;
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-success:hover {
+      box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-danger:hover {
+      box-shadow: 0 12px 35px rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, rgba(107, 114, 128, 0.8), rgba(75, 85, 99, 0.8));
+      color: white;
+      box-shadow: 0 8px 25px rgba(107, 114, 128, 0.3);
+    }
+
+    .btn-secondary:hover {
+      box-shadow: 0 12px 35px rgba(107, 114, 128, 0.4);
+    }
+
+    /* Tabla futurista */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    table { 
+      border-collapse: collapse; 
+      width: 100%; 
+      background: transparent;
+    }
+
+    th, td { 
+      padding: 16px 20px; 
+      text-align: left; 
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    th { 
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.95);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(20px);
+      border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+    }
+
+    tr:hover {
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+      transform: scale(1.01);
+      transition: all 0.2s ease;
+    }
+
+    tr.selected { 
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .feasibility-column {
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* Mensaje sin enlaces */
+    .mensaje-sin-enlaces {
+      text-align: center;
+      padding: 80px 20px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .mensaje-sin-enlaces i {
+      font-size: 5rem;
+      color: rgba(255, 255, 255, 0.2);
+      margin-bottom: 25px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+     .mensaje-sin-enlaces h3 {
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 700;
+    }
+
+    .mensaje-sin-enlaces p {
+      margin-bottom: 25px;
+      font-size: 1.1rem;
+    }
+
+    /* Loading spinner mejorado */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 30px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive mejorado */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      .header {
+        flex-direction: column;
+        text-align: center;
+        padding: 30px 20px;
+        gap: 20px;
+      }
+
+      .company-info h1 {
+        font-size: 2.5rem;
+      }
+
+      .logo-wrapper {
+        width: 100px;
+        height: 100px;
+      }
+
+      .tabs {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .tab-button {
+        border-radius: 12px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .btn {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+      }
+
+      .main-content {
+        padding: 25px 20px;
+      }
+    }
+
+    /* Efectos de micro-interacciones */
+    .form-grid div {
+      animation: slideInUp 0.4s ease-out;
+    }
+
+    @keyframes slideInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Mejoras adicionales de accesibilidad */
+    .form-grid input:focus {
+      outline: 2px solid #667eea;
+      outline-offset: 2px;
+    }
+
+    .btn:focus {
+      outline: 2px solid rgba(255, 255, 255, 0.5);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+    
+  <div class="container">
+   <!-- Header mejorado con logo espectacular -->
+    <div class="header">
+      <div class="logo-container">
+        <div class="logo-wrapper">
+          <div class="logo">
+            <div class="logo-orbit"></div>
+            <div class="logo-particles"></div>
+            <img src="img/logo_empresa.png" alt="Logo Fangio Telecom" />
+          </div>
+          <div class="premium-badge">Pro</div>
+        </div>
+      </div>
+      <div class="company-info">
+        <h1>Fangio Telecom</h1>
+        <div class="subtitle">Base de datos de Enlaces PtP</div>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <!-- Pestañas de navegación -->
+      <div class="tabs-container">
+        <div class="tabs">
+          <button class="tab-button active" onclick="mostrarPestana('formulario')">
+             <i class="fas fa-edit"></i> Formulario de Enlaces
+          </button>
+          <button class="tab-button" onclick="mostrarPestana('enlaces')">
+            <i class="fas fa-list"></i> Mis Enlaces (<span id="contador-enlaces">0</span>)
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenido de la pestaña Formulario -->
+      <div id="tab-formulario" class="tab-content active">
+        <div class="frecuencia-info">
+          <strong><i class="fas fa-info-circle"></i> Reglas de Frecuencia:</strong><br>
+          • 0-5 km: 80 GHz<br>
+          • 5-15 km: 15 GHz<br>
+          • 15+ km: 8 GHz
+        </div>
+
+        <div class="file-upload">
+          <label for="inputFile">
+            <i class="fas fa-upload"></i> Cargar archivo Excel
+          </label>
+          <input type="file" id="inputFile" accept=".xlsx" />
+          <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Cargando archivo...</p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div><label for="idA"><i class="fas fa-id-card"></i> ID A</label><input type="text" id="idA" /></div>
+          <div><label for="idB"><i class="fas fa-id-card"></i> ID B</label><input type="text" id="idB" /></div>
+          <div><label for="nombreA"><i class="fas fa-building"></i> Nombre Sitio A</label><input type="text" id="nombreA" /></div>
+          <div><label for="nombreB"><i class="fas fa-building"></i> Nombre Sitio B</label><input type="text" id="nombreB" /></div>
+          <div><label for="latA"><i class="fas fa-map-marker-alt"></i> Latitud A</label><input type="text" id="latA" /></div>
+          <div><label for="lonA"><i class="fas fa-map-marker-alt"></i> Longitud A</label><input type="text" id="lonA" /></div>
+          <div><label for="latB"><i class="fas fa-map-marker-alt"></i> Latitud B</label><input type="text" id="latB" /></div>
+          <div><label for="lonB"><i class="fas fa-map-marker-alt"></i> Longitud B</label><input type="text" id="lonB" /></div>
+          <div><label for="latArad"><i class="fas fa-calculator"></i> Latitud A (rad)</label><input type="text" id="latArad" readonly /></div>
+          <div><label for="lonArad"><i class="fas fa-calculator"></i> Longitud A (rad)</label><input type="text" id="lonArad" readonly /></div>
+          <div><label for="latBrad"><i class="fas fa-calculator"></i> Latitud B (rad)</label><input type="text" id="latBrad" readonly /></div>
+          <div><label for="lonBrad"><i class="fas fa-calculator"></i> Longitud B (rad)</label><input type="text" id="lonBrad" readonly /></div>
+          <div><label for="distancia"><i class="fas fa-ruler"></i> Distancia (km)</label><input type="text" id="distancia" readonly /></div>
+          <div><label for="frecuencia"><i class="fas fa-signal"></i> Frecuencia (GHz)</label><input type="text" id="frecuencia" readonly style="background-color: #ffffcc;" /></div>
+          <div><label for="alturaA"><i class="fas fa-arrows-alt-v"></i> Altura Torre A</label><input type="text" id="alturaA" /></div>
+          <div><label for="alturaB"><i class="fas fa-arrows-alt-v"></i> Altura Torre B</label><input type="text" id="alturaB" /></div>
+          <div><label for="ranA"><i class="fas fa-wifi"></i> Altura RAN A</label><input type="text" id="ranA" /></div>
+          <div><label for="ranB"><i class="fas fa-wifi"></i> Altura RAN B</label><input type="text" id="ranB" /></div>
+          <div><label for="TransA"><i class="fas fa-truck"></i> Tipo de transporte sitio A</label><input type="text" id="TransA" /></div>
+          <div><label for="TransB"><i class="fas fa-truck"></i> Tipo de transporte sitio B</label><input type="text" id="TransB" /></div>
+          <div><label for="ArreA"><i class="fas fa-handshake"></i> Tipo de Arrendamiento A</label><input type="text" id="ArreA" /></div>
+          <div><label for="ArreB"><i class="fas fa-handshake"></i> Tipo de Arrendamiento B</label><input type="text" id="ArreB" /></div>
+          <div><label for="OnA"><i class="fas fa-power-off"></i> On Air A</label><input type="text" id="OnA" /></div>
+          <div><label for="OnB"><i class="fas fa-power-off"></i> On Air B</label><input type="text" id="OnB" /></div>
+          <div><label for="TorreA"><i class="fas fa-broadcast-tower"></i> Tipo de Torre A</label><input type="text" id="TorreA" /></div>
+          <div><label for="TorreB"><i class="fas fa-broadcast-tower"></i> Tipo de Torre B</label><input type="text" id="TorreB" /></div>
+          <div><label for="TorreA"><i class="fas fa-broadcast-tower"></i> Estado A</label><input type="text" id="EstadoA" /></div>
+          <div><label for="TorreA"><i class="fas fa-broadcast-tower"></i> Estado B</label><input type="text" id="EstadoB" /></div>
+        </div>
+
+        <div class="action-buttons">
+          <button id="agregarBtn" class="btn btn-success" onclick="agregarOActualizarEnlace()">
+            <i class="fas fa-check"></i> Agregar Enlace
+          </button>
+          <button class="btn btn-secondary" onclick="limpiarFormulario()">
+            <i class="fas fa-trash"></i> Limpiar Formulario
+          </button>
+          <button class="btn btn-primary" onclick="mostrarPestana('enlaces')">
+            <i class="fas fa-list"></i> Ver Mis Enlaces
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenido de la pestaña Enlaces -->
+      <div id="tab-enlaces" class="tab-content">
+        <div class="enlaces-counter">
+          <i class="fas fa-chart-line"></i> Total de Enlaces Registrados: <span id="total-enlaces">0</span>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn btn-primary" onclick="mostrarPestana('formulario')">
+            <i class="fas fa-plus"></i> Agregar Nuevo Enlace
+          </button>
+          <button id="eliminarBtn" class="btn btn-danger" onclick="eliminarEnlace()" disabled>
+            <i class="fas fa-trash"></i> Eliminar Seleccionado
+          </button>
+          <button class="btn btn-success" onclick="exportarExcel()">
+            <i class="fas fa-file-excel"></i> Exportar a Excel
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table id="tabla">
+            <thead>
+              <tr>
+                <th>ID A</th><th>Nombre A</th><th>Lat A</th><th>Lon A</th>
+                <th>Lat A (rad)</th><th>Lon A (rad)</th>
+                <th>ID B</th><th>Nombre B</th><th>Lat B</th><th>Lon B</th>
+                <th>Lat B (rad)</th><th>Lon B (rad)</th>
+                <th>Distancia (km)</th><th>Frecuencia (GHz)</th>
+                <th>Altura Torre A</th><th>Altura Torre B</th>
+                <th>Altura RAN A</th><th>Altura RAN B</th>
+                <th>Tipo de transporte sitio A</th><th>Tipo de transporte sitio B</th>
+                <th>Tipo de Arrendamiento A</th><th>Tipo de Arrendamiento B</th>
+                <th>On Air A</th><th>On Air B</th><th>Tipo de torre A</th><th>Tipo de torre B</th>
+                <th>Estado Sitio A</th><th>Estado Sitio B</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div id="mensaje-sin-enlaces" class="mensaje-sin-enlaces" style="display: none;">
+          <i class="fas fa-broadcast-tower"></i>
+          <h3>No hay enlaces registrados</h3>
+          <p>Usa el formulario para agregar tu primer enlace PtP</p>
+          <button class="btn btn-primary" onclick="mostrarPestana('formulario')">
+            <i class="fas fa-plus"></i> Agregar Primer Enlace
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  let dataExcel = [];
+  let filaEditando = null;
+
+  document.getElementById('inputFile').addEventListener('change', (e) => {
+    const loading = document.getElementById('loading');
+    loading.classList.add('active');
+    
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const data = new Uint8Array(e.target.result);
+      const workbook = XLSX.read(data, { type: 'array' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      dataExcel = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+      console.log('Datos Excel cargados:', dataExcel.length, 'filas');
+      loading.classList.remove('active');
+    };
+    reader.readAsArrayBuffer(e.target.files[0]);
+  });
+
+  document.getElementById('idA').addEventListener('blur', () => autoCompletar('A'));
+  document.getElementById('idB').addEventListener('blur', () => autoCompletar('B'));
+
+  document.getElementById('latA').addEventListener('input', actualizarCalculos);
+  document.getElementById('lonA').addEventListener('input', actualizarCalculos);
+  document.getElementById('latB').addEventListener('input', actualizarCalculos);
+  document.getElementById('lonB').addEventListener('input', actualizarCalculos);
+
+  function mostrarPestana(pestana) {
+    // Ocultar todas las pestañas
+    document.querySelectorAll('.tab-content').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    
+    // Remover clase active de todos los botones
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    // Mostrar la pestaña seleccionada
+    document.getElementById('tab-' + pestana).classList.add('active');
+    
+    // Activar el botón correspondiente
+    event.target.classList.add('active');
+    
+    // Actualizar contador de enlaces
+    actualizarContadorEnlaces();
+    
+    // Mostrar/ocultar mensaje cuando no hay enlaces
+    verificarEnlacesVacios();
+  }
+
+  function actualizarContadorEnlaces() {
+    const totalEnlaces = document.querySelectorAll('#tabla tbody tr').length;
+    document.getElementById('contador-enlaces').textContent = totalEnlaces;
+    document.getElementById('total-enlaces').textContent = totalEnlaces;
+  }
+
+  function verificarEnlacesVacios() {
+    const totalEnlaces = document.querySelectorAll('#tabla tbody tr').length;
+    const tabla = document.querySelector('.table-container');
+    const mensaje = document.getElementById('mensaje-sin-enlaces');
+    
+    if (totalEnlaces === 0) {
+      tabla.style.display = 'none';
+      mensaje.style.display = 'block';
+    } else {
+      tabla.style.display = 'block';
+      mensaje.style.display = 'none';
+    }
+  }
+
+  function autoCompletar(letra) {
+    const id = document.getElementById('id' + letra).value.trim();
+    if (!id) return;
+
+    const fila = dataExcel.find(row => row[0] == id);
+    if (fila) {
+      document.getElementById('nombre' + letra).value = fila[3] || '';
+      document.getElementById('lat' + letra).value = fila[11] || '';
+      document.getElementById('lon' + letra).value = fila[12] || '';
+      document.getElementById('altura' + letra).value = fila[51] || '';
+      document.getElementById('ran' + letra).value = fila[52] || '';
+      document.getElementById('Trans' + letra).value = fila[103] || '';
+      document.getElementById('Arre' + letra).value = fila[4] || '';
+      document.getElementById('On' + letra).value = fila[102] || '';
+      document.getElementById('Torre' + letra).value = fila[21] || '';
+      document.getElementById('Estado' + letra).value = fila[13] || '';
+      actualizarCalculos();
+    } else {
+      document.getElementById('nombre' + letra).value = '';
+      document.getElementById('lat' + letra).value = '';
+      document.getElementById('lon' + letra).value = '';
+      document.getElementById('altura' + letra).value = '';
+      document.getElementById('ran' + letra).value = '';
+      document.getElementById('Trans' + letra).value = '';
+      document.getElementById('Arre' + letra).value = '';
+      document.getElementById('On' + letra).value = '';
+      document.getElementById('Torre' + letra).value = '';
+      document.getElementById('Estado' + letra).value = '';
+      actualizarCalculos();
+    }
+  }
+
+  function actualizarCalculos() {
+    actualizarRadianes();
+    calcularDistanciaYFrecuencia();
+  }
+
+  function actualizarRadianes() {
+    const rad = x => x * Math.PI / 180;
+
+    const latA = parseFloat(document.getElementById('latA').value);
+    const lonA = parseFloat(document.getElementById('lonA').value);
+    const latB = parseFloat(document.getElementById('latB').value);
+    const lonB = parseFloat(document.getElementById('lonB').value);
+
+    document.getElementById('latArad').value = isNaN(latA) ? '' : rad(latA).toFixed(6);
+    document.getElementById('lonArad').value = isNaN(lonA) ? '' : rad(lonA).toFixed(6);
+    document.getElementById('latBrad').value = isNaN(latB) ? '' : rad(latB).toFixed(6);
+    document.getElementById('lonBrad').value = isNaN(lonB) ? '' : rad(lonB).toFixed(6);
+  }
+
+  function calcularDistancia(lat1, lon1, lat2, lon2) {
+    if (isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) return NaN;
+    const rad = x => x * Math.PI / 180;
+    const R = 6371.0088;
+    const φ1 = rad(lat1), φ2 = rad(lat2);
+    const Δφ = rad(lat2 - lat1);
+    const Δλ = rad(lon2 - lon1);
+    const a = Math.sin(Δφ / 2) ** 2 +
+              Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  function asignarFrecuencia(distanciaKm) {
+    if (isNaN(distanciaKm)) return '';
+    
+    if (distanciaKm <= 5) {
+      return '23';
+    } else if (distanciaKm <= 15) {
+      return '15';
+    } else {
+      return '8';
+    }
+  }
+
+  function calcularDistanciaYFrecuencia() {
+    const latA = parseFloat(document.getElementById('latA').value);
+    const lonA = parseFloat(document.getElementById('lonA').value);
+    const latB = parseFloat(document.getElementById('latB').value);
+    const lonB = parseFloat(document.getElementById('lonB').value);
+
+    const distanciaKm = calcularDistancia(latA, lonA, latB, lonB);
+    if (!isNaN(distanciaKm)) {
+      document.getElementById('distancia').value = distanciaKm.toFixed(6);
+      document.getElementById('frecuencia').value = asignarFrecuencia(distanciaKm);
+    } else {
+      document.getElementById('distancia').value = '';
+      document.getElementById('frecuencia').value = '';
+    }
+  }
+
+  function agregarOActualizarEnlace() {
+    const get = id => document.getElementById(id).value.trim();
+
+    const latA = parseFloat(get('latA'));
+    const lonA = parseFloat(get('lonA'));
+    const latB = parseFloat(get('latB'));
+    const lonB = parseFloat(get('lonB'));
+
+    const latArad = document.getElementById('latArad').value;
+    const lonArad = document.getElementById('lonArad').value;
+    const latBrad = document.getElementById('latBrad').value;
+    const lonBrad = document.getElementById('lonBrad').value;
+
+    const distanciaKm = calcularDistancia(latA, lonA, latB, lonB);
+    const distanciaStr = isNaN(distanciaKm) ? '' : distanciaKm.toFixed(6);
+    const frecuencia = asignarFrecuencia(distanciaKm);
+
+    if (!get('idA') || !get('idB')) {
+      alert('Debes ingresar ID A y ID B');
+      return;
+    }
+    if (!latA || !lonA || !latB || !lonB) {
+      alert('Latitud y longitud deben ser números válidos para ambos sitios');
+      return;
+    }
+
+    const filaDatos = [
+      get('idA'), get('nombreA'), get('latA'), get('lonA'),
+      latArad, lonArad,
+      get('idB'), get('nombreB'), get('latB'), get('lonB'),
+      latBrad, lonBrad,
+      distanciaStr, frecuencia, get('alturaA'), get('alturaB'),
+      get('ranA'), get('ranB'),
+      get('TransA'), get('TransB'),
+      get('ArreA'), get('ArreB'),
+      get('OnA'), get('OnB'),
+      get('TorreA'), get('TorreB'), get('EstadoA'), get('EstadoB')
+    ];
+
+    if (filaEditando) {
+      // Actualizar fila existente
+      const celdas = filaEditando.querySelectorAll('td');
+      filaDatos.forEach((val, i) => celdas[i].textContent = val);
+      filaEditando.classList.remove('selected');
+      filaEditando = null;
+      document.getElementById('agregarBtn').textContent = '✅ Agregar Enlace';
+      document.getElementById('eliminarBtn').disabled = true;
+    } else {
+      // Insertar nueva fila
+      const fila = document.createElement('tr');
+      filaDatos.forEach(val => {
+        const td = document.createElement('td');
+        td.textContent = val;
+        fila.appendChild(td);
+      });
+      document.querySelector('#tabla tbody').appendChild(fila);
+
+      fila.addEventListener('click', () => {
+        if (filaEditando) filaEditando.classList.remove('selected');
+        filaEditando = fila;
+        fila.classList.add('selected');
+        cargarFilaEnFormulario(fila);
+        document.getElementById('agregarBtn').textContent = '✏️ Actualizar Enlace';
+        document.getElementById('eliminarBtn').disabled = false;
+        // Cambiar automáticamente a la pestaña del formulario
+        mostrarPestana('formulario');
+        document.querySelector('.tab-button').classList.add('active');
+      });
+    }
+
+    actualizarContadorEnlaces();
+    verificarEnlacesVacios();
+    limpiarFormulario();
+    
+    // Mostrar mensaje de éxito y cambiar a pestaña de enlaces
+    alert('✅ Enlace agregado exitosamente');
+    mostrarPestana('enlaces');
+    document.querySelectorAll('.tab-button')[1].classList.add('active');
+  }
+
+  function cargarFilaEnFormulario(fila) {
+    const celdas = fila.querySelectorAll('td');
+    const ids = [
+      'idA','nombreA','latA','lonA','latArad','lonArad',
+      'idB','nombreB','latB','lonB','latBrad','lonBrad',
+      'distancia','frecuencia','alturaA','alturaB',
+      'ranA','ranB','TransA','TransB','ArreA','ArreB',
+      'OnA','OnB','TorreA','TorreB', 'EstadoA','EstadoB'
+    ];
+    ids.forEach((id, i) => {
+      if (document.getElementById(id)) {
+        document.getElementById(id).value = celdas[i].textContent;
+      }
+    });
+  }
+
+  function eliminarEnlace() {
+    if (!filaEditando) return;
+    if (!confirm('¿Seguro quieres eliminar la fila seleccionada?')) return;
+    filaEditando.remove();
+    filaEditando = null;
+    limpiarFormulario();
+    document.getElementById('agregarBtn').textContent = '✅ Agregar Enlace';
+    document.getElementById('eliminarBtn').disabled = true;
+    actualizarContadorEnlaces();
+    verificarEnlacesVacios();
+  }
+
+  function limpiarFormulario() {
+    const campos = [
+      'idA','nombreA','latA','lonA','latArad','lonArad',
+      'idB','nombreB','latB','lonB','latBrad','lonBrad',
+      'distancia','frecuencia','alturaA','alturaB','ranA','ranB',
+      'TransA','TransB','ArreA','ArreB','OnA','OnB','TorreA','TorreB',  'EstadoA','EstadoB'
+    ];
+    campos.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('agregarBtn').textContent = '✅ Agregar Enlace';
+    document.getElementById('eliminarBtn').disabled = true;
+    filaEditando = null;
+  }
+
+  function exportarExcel() {
+    const tabla = document.getElementById('tabla');
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.table_to_sheet(tabla);
+    XLSX.utils.book_append_sheet(wb, ws, "EnlacesPtP");
+    XLSX.writeFile(wb, "enlaces_ptp.xlsx");
+  }
+
+  // Inicializar la aplicación
+  document.addEventListener('DOMContentLoaded', function() {
+    actualizarContadorEnlaces();
+    verificarEnlacesVacios();
+  });
+</script>
+
+</body>
+</html>
+           

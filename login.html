@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fangio Telecom - Acceso al Sistema</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0f0c29 0%, #24243e 35%, #313264 100%);
+      min-height: 100vh;
+      color: #333;
+      position: relative;
+      overflow-x: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Animated background particles */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.1), transparent),
+        radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.1), transparent),
+        radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.1), transparent),
+        radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.1), transparent);
+      background-repeat: repeat;
+      background-size: 150px 150px;
+      animation: drift 20s infinite linear;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0); }
+      to { transform: translate(-150px, -150px); }
+    }
+
+    /* Login Container */
+    .login-container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 50px;
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 
+        0 25px 50px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .login-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    /* Logout Button - positioned at top right */
+    .logout-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .logout-btn:hover {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.3));
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
+    }
+
+    .logout-btn.show {
+      display: flex;
+    }
+
+    /* Session info */
+    .session-info {
+      position: absolute;
+      top: 70px;
+      right: 20px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .session-info.show {
+      display: flex;
+    }
+
+    /* Logo Container */
+    .logo-container {
+      text-align: center;
+      margin-bottom: 40px;
+      position: relative;
+    }
+
+    .logo-wrapper {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
+      perspective: 1000px;
+    }
+
+    .logo {
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+      overflow: hidden;
+    }
+
+    .logo::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #667eea);
+      background-size: 300% 300%;
+      border-radius: 23px;
+      animation: gradientShift 3s ease infinite;
+      z-index: -2;
+    }
+
+    .logo::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      background: linear-gradient(135deg, rgba(15, 12, 41, 0.9), rgba(36, 36, 62, 0.9));
+      border-radius: 18px;
+      z-index: -1;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .logo img {
+      width: 80%;
+      height: 80%;
+      object-fit: contain;
+      border-radius: 16px;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3))
+              brightness(1.1)
+              contrast(1.1)
+              saturate(1.2);
+      transition: all 0.4s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .logo:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 
+        0 20px 40px rgba(102, 126, 234, 0.4),
+        0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Company Info */
+    .company-info h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff, #e0e7ff, #c7d2fe);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+
+    .company-info .subtitle {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .access-title {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Form Styles */
+    .login-form {
+      margin-top: 40px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 8px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 16px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      color: white;
+      position: relative;
+    }
+
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.2),
+        0 8px 25px rgba(102, 126, 234, 0.1);
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    .form-group.password-field {
+      position: relative;
+    }
+
+    .form-group.password-field input {
+      padding-right: 50px;
+    }
+
+    /* Login Button */
+    .login-btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 30px;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .login-btn:hover::before {
+      left: 100%;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Error Message */
+    .error-message {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.2));
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      display: none;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    /* Success Message */
+    .success-message {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      display: none;
+    }
+
+    .success-message.show {
+      display: block;
+    }
+
+    /* Loading State */
+    .loading {
+      display: none;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Security Badge */
+    .security-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 30px;
+      padding: 15px;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      color: #6ee7b7;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .login-container {
+        margin: 20px;
+        padding: 40px 30px;
+      }
+
+      .company-info h1 {
+        font-size: 2rem;
+      }
+
+      .logo-wrapper {
+        width: 80px;
+        height: 80px;
+      }
+
+      .logout-btn, .session-info {
+        position: static;
+        margin: 0 0 20px 0;
+        align-self: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <!-- Botón de cerrar sesión -->
+    <button id="logout-btn" class="logout-btn">
+      <i class="fas fa-sign-out-alt"></i>
+      Cerrar Sesión
+    </button>
+
+    <!-- Información de sesión -->
+    <div id="session-info" class="session-info">
+      <i class="fas fa-clock"></i>
+      <span id="session-time">Sesión activa</span>
+    </div>
+
+    <!-- Logo y información de la empresa -->
+    <div class="logo-container">
+      <div class="logo-wrapper">
+        <div class="logo">
+          <img src="img/logo_empresa.png" alt="Logo Fangio Telecom" />
+        </div>
+      </div>
+      <div class="company-info">
+        <h1>Fangio Telecom</h1>
+        <div class="subtitle">Sistema de Gestión PtP</div>
+        <div class="access-title">Acceso Seguro</div>
+      </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div id="error-message" class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      Usuario o contraseña incorrectos
+    </div>
+
+    <!-- Mensaje de éxito -->
+    <div id="success-message" class="success-message">
+      <i class="fas fa-check-circle"></i>
+      Sesión cerrada correctamente
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Verificando credenciales...</p>
+    </div>
+
+    <!-- Formulario de login -->
+    <form id="login-form" class="login-form">
+      <div class="form-group">
+        <label for="username">
+          <i class="fas fa-user"></i>
+          Usuario
+        </label>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          placeholder="Ingresa tu usuario"
+          required
+          autocomplete="username"
+        />
+      </div>
+
+      <div class="form-group password-field">
+        <label for="password">
+          <i class="fas fa-lock"></i>
+          Contraseña
+        </label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Ingresa tu contraseña"
+          required
+          autocomplete="current-password"
+        />
+        <button type="button" class="password-toggle" onclick="togglePassword()">
+          <i class="fas fa-eye" id="password-icon"></i>
+        </button>
+      </div>
+
+      <button type="submit" class="login-btn" id="login-btn">
+        <i class="fas fa-sign-in-alt"></i>
+        Iniciar Sesión
+      </button>
+    </form>
+
+    <!-- Badge de seguridad -->
+    <div class="security-badge">
+      <i class="fas fa-shield-alt"></i>
+      Conexión Segura SSL
+    </div>
+  </div>
+
+  <script>
+    // Credenciales de acceso
+    const CREDENTIALS = {
+      username: 'fangio',
+      password: 'microondas'
+    };
+
+    // Elementos del DOM
+    const loginForm = document.getElementById('login-form');
+    const errorMessage = document.getElementById('error-message');
+    const successMessage = document.getElementById('success-message');
+    const loading = document.getElementById('loading');
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const sessionInfo = document.getElementById('session-info');
+    const sessionTime = document.getElementById('session-time');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+
+    // Función para alternar visibilidad de contraseña
+    function togglePassword() {
+      const passwordField = document.getElementById('password');
+      const passwordIcon = document.getElementById('password-icon');
+      
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        passwordIcon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        passwordField.type = 'password';
+        passwordIcon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    // Función para mostrar error
+    function showError(message) {
+      hideAllMessages();
+      errorMessage.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${message}`;
+      errorMessage.classList.add('show');
+      setTimeout(() => {
+        errorMessage.classList.remove('show');
+      }, 4000);
+    }
+
+    // Función para mostrar mensaje de éxito
+    function showSuccess(message) {
+      hideAllMessages();
+      successMessage.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+      successMessage.classList.add('show');
+      setTimeout(() => {
+        successMessage.classList.remove('show');
+      }, 3000);
+    }
+
+    // Función para ocultar todos los mensajes
+    function hideAllMessages() {
+      errorMessage.classList.remove('show');
+      successMessage.classList.remove('show');
+    }
+
+    // Función para mostrar loading
+    function showLoading(show) {
+      if (show) {
+        loading.classList.add('active');
+        loginForm.style.display = 'none';
+        loginBtn.disabled = true;
+      } else {
+        loading.classList.remove('active');
+        loginForm.style.display = 'block';
+        loginBtn.disabled = false;
+      }
+    }
+
+    // Función para validar credenciales
+    function validateCredentials(username, password) {
+      return username === CREDENTIALS.username && password === CREDENTIALS.password;
+    }
+
+    // Función para formatear tiempo de sesión
+    function formatSessionTime(loginTime) {
+      const now = new Date().getTime();
+      const elapsed = now - parseInt(loginTime);
+      const minutes = Math.floor(elapsed / (1000 * 60));
+      const hours = Math.floor(minutes / 60);
+      
+      if (hours > 0) {
+        return `${hours}h ${minutes % 60}m`;
+      } else {
+        return `${minutes}m`;
+      }
+    }
+
+    // Función para actualizar información de sesión
+    function updateSessionInfo() {
+      const loginTime = sessionStorage.getItem('loginTime');
+      if (loginTime) {
+        const timeText = formatSessionTime(loginTime);
+        sessionTime.textContent = `Sesión activa: ${timeText}`;
+      }
+    }
+
+    // Función para mostrar/ocultar elementos de sesión
+    function toggleSessionElements(show) {
+      if (show) {
+        logoutBtn.classList.add('show');
+        sessionInfo.classList.add('show');
+        updateSessionInfo();
+        // Actualizar cada minuto
+        setInterval(updateSessionInfo, 60000);
+      } else {
+        logoutBtn.classList.remove('show');
+        sessionInfo.classList.remove('show');
+      }
+    }
+
+    // Función para cerrar sesión
+    function logout() {
+      // Limpiar sessionStorage
+      sessionStorage.removeItem('isAuthenticated');
+      sessionStorage.removeItem('loginTime');
+      
+      // Ocultar elementos de sesión
+      toggleSessionElements(false);
+      
+      // Limpiar formulario
+      usernameInput.value = '';
+      passwordInput.value = '';
+      
+      // Mostrar mensaje de éxito
+      showSuccess('Sesión cerrada correctamente');
+      
+      // Enfocar campo de usuario
+      setTimeout(() => {
+        usernameInput.focus();
+      }, 500);
+    }
+
+    // Función para manejar el login exitoso
+    function handleSuccessfulLogin() {
+      // Guardar estado de autenticación en sessionStorage
+      sessionStorage.setItem('isAuthenticated', 'true');
+      sessionStorage.setItem('loginTime', new Date().getTime().toString());
+      
+      // Mostrar elementos de sesión
+      toggleSessionElements(true);
+      
+      // Mostrar mensaje de éxito
+      showSuccess('¡Bienvenido al sistema! Redirigiendo...');
+      
+      // Redirigir al gestor de enlaces después de 2 segundos
+      setTimeout(() => {
+        window.location.href = 'gestor-enlaces.html';
+      }, 2000);
+    }
+
+    // Event listener para el botón de logout
+    logoutBtn.addEventListener('click', function() {
+      logout();
+    });
+
+    // Event listener para el formulario
+    loginForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+      
+      // Validar campos vacíos
+      if (!username || !password) {
+        showError('Por favor completa todos los campos');
+        return;
+      }
+      
+      // Mostrar loading
+      showLoading(true);
+      
+      // Simular delay de autenticación (opcional)
+      setTimeout(() => {
+        if (validateCredentials(username, password)) {
+          // Login exitoso
+          showLoading(false);
+          handleSuccessfulLogin();
+        } else {
+          // Credenciales incorrectas
+          showLoading(false);
+          showError('Usuario o contraseña incorrectos');
+          passwordInput.value = '';
+          passwordInput.focus();
+        }
+      }, 1500);
+    });
+
+    // Verificar si ya está autenticado al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+      const isAuthenticated = sessionStorage.getItem('isAuthenticated');
+      const loginTime = sessionStorage.getItem('loginTime');
+      
+      if (isAuthenticated === 'true' && loginTime) {
+        const currentTime = new Date().getTime();
+        const sessionDuration = 8 * 60 * 60 * 1000; // 8 horas en milisegundos
+        
+        if (currentTime - parseInt(loginTime) < sessionDuration) {
+          // Sesión válida, redirigir inmediatamente
+          window.location.href = 'gestor-enlaces.html';
+        } else {
+          // Sesión expirada, limpiar
+          sessionStorage.removeItem('isAuthenticated');
+          sessionStorage.removeItem('loginTime');
+          showError('Sesión expirada. Por favor, inicia sesión nuevamente.');
+        }
+      }
+      
+      // Enfocar el campo de usuario si no hay sesión activa
+      if (!isAuthenticated) {
+        usernameInput.focus();
+      }
+    });
+
+    // Manejar Enter en los campos
+    usernameInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        passwordInput.focus();
+      }
+    });
+
+    passwordInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        loginForm.dispatchEvent(new Event('submit'));
+      }
+    });
+
+    // Limpiar mensajes de error al escribir
+    usernameInput.addEventListener('input', function() {
+      hideAllMessages();
+    });
+
+    passwordInput.addEventListener('input', function() {
+      hideAllMessages();
+    });
+  </script>
+</body>
+</html>
